@@ -38,7 +38,7 @@ def load_from_esearch(**kwargs):
              "lt" : ts_end.isoformat(),
         }
     }}
-    })['hits']['hits']
+    }, size=10000)['hits']['hits']
     res = list(map(lambda x: json.loads(x['_source']['message']), res))
     return {'ts_start': ts_start, 'ts_end': ts_end, 'res': res}
 
@@ -60,7 +60,7 @@ def save_to_clickhouse(**kwargs):
     client = clickhouse_driver.Client('Localhost')
     client.execute('SET input_format_skip_unknown_fields=1;')
     client.execute('INSERT INTO clicks VALUES', j)
-
+    return "Total clicks added: " + str(len(j))
 
 es = PythonOperator(
     task_id='load_from_esearch',
